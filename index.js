@@ -1,5 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
+const exec = require('@actions/exec');
 
 try {
 
@@ -20,6 +21,40 @@ try {
     let _args = JSON.parse(args);
 
     let finalConfig = Object.assign(config, _args);
+
+    var params = {};
+    if (config.deploy) {
+        config.environments.forEach(environment => {
+            if (['cicd-prd', 'runtime-prd', 'landingzone'].includes(environment)) {
+                if (['master', 'main'].includes(github.context.ref)) {
+                    params[`DEPLOY_${environment.toUpperCase()}`] = config.autoDeployToPrd;
+                }
+            } else {
+                params[`DEPLOY_${environment.toUpperCase()}`] = false;
+            }
+        });
+    }
+
+    // Checkout this repository using git
+    // Enable fetch depth to 1 to speed up cloning.`
+    // const git = require('simple-git/promise')();
+    // await git.init();
+    // await git.addConfig('user.name', 'github-actions[bot]');
+    // await git.addConfig('user.email', 'github-actions[bot]@users.noreply.');
+    // await git.addConfig('pull.rebase', 'false');
+    // await git.addConfig('fetch.prune', 'true');
+    // await git.addConfig('fetch.depth', '1');
+    // await git.addConfig('remote.origin.fetch', '+refs/heads/*:refs/remotes/origin/*');
+
+
+    exec.exec('checkout@v3')
+    // Get a directory listing
+    exec.exec('ls', ['-al']);
+
+
+    // Get the current git branch
+    const branch = github.context.ref;
+    console.log(`branch: ${branch}`);
 
     console.log(`finalConfig: ${JSON.stringify(finalConfig)}`);
 
