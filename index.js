@@ -16,10 +16,10 @@ try {
         autoDeployToPrd: true,
     }
 
-    let input = core.getInput('config');
-    let _input = JSON.parse(input);
+    let args = core.getInput('args');
+    let _args = JSON.parse(args);
 
-    let finalConfig = Object.assign(config, _input);
+    let finalConfig = Object.assign(config, _args);
 
     console.log(`finalConfig: ${JSON.stringify(finalConfig)}`);
 
